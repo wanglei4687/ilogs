@@ -1,2 +1,2 @@
-# wlog
-go log library
+# ilog
+golang log library
