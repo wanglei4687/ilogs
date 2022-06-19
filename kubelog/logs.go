@@ -1,8 +1,10 @@
 package kubelog
 
 import (
+	"context"
 	"flag"
 	"log"
+	"os"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -11,9 +13,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/klog/v2"
+	"k8s.io/klog/v2/klogr"
 )
 
 var logFlushFreq = flag.Duration("log-flush-frequency", 5*time.Second, "Maximum number of seconds between log flushes")
+var Log = klogr.New().WithName(os.Getenv("LOGNAME"))
 
 type GlogWriter struct{}
 
@@ -58,4 +62,19 @@ func WithCRScheme(lg logr.Logger, obj metav1.Object, scheme *runtime.Scheme) log
 		"kind", gvk.Kind,
 		"Version", gvk.Version,
 	)
+}
+
+var contextKey = &struct{}{}
+
+func IContext(ctx context.Context, names ...string) logr.Logger {
+	l, err := logr.FromContext(ctx)
+	if err != nil {
+		l = Log
+	}
+
+	for _, n := range names {
+		l = l.WithName(n)
+	}
+
+	return l
 }
