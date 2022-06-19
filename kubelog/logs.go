@@ -35,7 +35,7 @@ func InitLog(fs *flag.FlagSet) {
 	log.SetOutput(GlogWriter{})
 	log.SetFlags(0)
 
-	go wait.Until(klog.Flush, *logFlushFreq, wait.NerverStop)
+	go wait.Until(klog.Flush, *logFlushFreq, wait.NeverStop)
 }
 
 func FlushLogs() {
